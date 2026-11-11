@@ -13,6 +13,18 @@ def normalize(s):
 
 gua = list(csv.DictReader((SOURCE / '卦辞.csv').open(encoding='utf-8-sig', newline='')))
 lines = list(csv.DictReader((SOURCE / '爻辞.csv').open(encoding='utf-8-sig', newline='')))
+senko_text = (SOURCE.parent / '易学大講座_占考384爻.md').read_text(encoding='utf-8-sig')
+senko = {}
+for match in re.finditer(r'(?ms)^##\s+(\d{2})-([1-6])　[^\n]*\n.*?^### 占考\s*\n(.*?)(?=^##\s+|\Z)', senko_text):
+    key = (int(match.group(1)), int(match.group(2)))
+    assert key not in senko, f'duplicate senko: {key}'
+    body = match.group(3).strip()
+    source_match = re.search(r'(?m)^（出典：(.+?)）\s*$', body)
+    source = source_match.group(1) if source_match else ''
+    body = re.sub(r'(?m)\n（出典：.*?）\s*$', '', body).strip()
+    assert body, f'empty senko: {key}'
+    senko[key] = (body, source)
+assert len(senko) == 384, f'expected 384 senko, got {len(senko)}'
 unique = {}
 for row in gua:
     name = row['卦名']
@@ -39,7 +51,8 @@ for index, (name, text) in enumerate(unique.items(), 1):
         target = next((i for i, n in enumerate(unique, 1) if normalize(n) == hidden_name), None)
         assert target, hidden_name
         hidden_position = POSITIONS.index(match[2] + '爻') + 1
-        entries.append({'position': position, 'label': label, 'text': row['爻辞'], 'meaning': row['意味'], 'hiddenId': target, 'hiddenPosition': hidden_position})
+        body, source = senko[(index, position)]
+        entries.append({'position': position, 'label': label, 'text': row['爻辞'], 'meaning': row['意味'], 'hiddenId': target, 'hiddenPosition': hidden_position, 'senko': body, 'source': source})
     data.append({'id': index, 'name': name, 'judgment': text, 'lines': entries})
 (ROOT / 'public').mkdir(exist_ok=True)
 (ROOT / '.private').mkdir(exist_ok=True)
