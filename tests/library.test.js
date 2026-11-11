@@ -8,6 +8,16 @@ test('64 unique hexagrams, 384 lines, 64 unique trigram pairs, all hidden refere
   assert.ok(validData(data));assert.equal(new Set(catalog.map(g=>g.bits)).size,64);assert.equal(new Set(catalog.map(g=>g.upper+g.lower)).size,64);
   for(const g of data)for(const line of g.lines)assert.ok(data[line.hiddenId-1].lines[line.hiddenPosition-1]);
 });
+test('small-image text is present for every line and mapped by upper and lower trigrams',()=>{
+  const samples=[
+    [1,1,'潜龙勿用，阳在下也。'],
+    [2,1,'履霜坚冰，阴始凝也。'],
+    [3,1,'虽磐桓，志行正也。']
+  ];
+  assert.equal(data.flatMap(g=>g.lines).filter(l=>typeof l.xiaoxiang==='string'&&l.xiaoxiang.length>0).length,384);
+  for(const [id,p,expected] of samples)assert.equal(data[id-1].lines[p-1].xiaoxiang,expected);
+  for(const g of data)for(const l of g.lines)assert.ok(data[l.hiddenId-1].lines[l.hiddenPosition-1].xiaoxiang);
+});
 test('all 384 positions are directly searchable by number and name',()=>{
   for(const g of catalog)for(let p=1;p<=6;p++)for(const query of [`${g.id}-${p}`,`${g.name}${p}爻`]){
     const found=search(catalog,data,query);assert.equal(found[0]?.id,g.id,query);assert.equal(found[0]?.position,p,query);

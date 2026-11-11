@@ -8,6 +8,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path(r'C:\Users\勝一郎\Documents\workspace\占い\易\易経大講座全巻')
 POSITIONS = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻']
 TRIGRAMS = {'天': '111', '沢': '110', '火': '101', '雷': '100', '風': '011', '水': '010', '山': '001', '地': '000'}
+TRIGRAM_NUMBERS = {'天': 1, '沢': 2, '火': 3, '雷': 4, '風': 5, '水': 6, '山': 7, '地': 8}
+xiaoxiang = json.loads((ROOT / 'data' / 'xiaoxiang.json').read_text(encoding='utf-8'))
+assert len(xiaoxiang) == 64 and all(len(v) == 6 and all(isinstance(s, str) and s.strip() for s in v) for v in xiaoxiang.values())
 def normalize(s):
     return s.translate(str.maketrans({'澤': '沢', '随': '隨', '豫': '予'}))
 
@@ -39,6 +42,7 @@ for index, (name, text) in enumerate(unique.items(), 1):
     else:
         upper, lower = name[:2]
     bits = TRIGRAMS[lower] + TRIGRAMS[upper] # Bottom to top
+    small_images = xiaoxiang[f'{TRIGRAM_NUMBERS[upper]}-{TRIGRAM_NUMBERS[lower]}']
     catalog.append({'id': index, 'name': name, 'upper': upper, 'lower': lower, 'bits': bits})
     selected = [r for r in lines if r['卦名'] == name]
     assert len(selected) == 6 and {r['爻'] for r in selected} == set(POSITIONS)
@@ -52,7 +56,7 @@ for index, (name, text) in enumerate(unique.items(), 1):
         assert target, hidden_name
         hidden_position = POSITIONS.index(match[2] + '爻') + 1
         body, source = senko[(index, position)]
-        entries.append({'position': position, 'label': label, 'text': row['爻辞'], 'meaning': row['意味'], 'hiddenId': target, 'hiddenPosition': hidden_position, 'senko': body, 'source': source})
+        entries.append({'position': position, 'label': label, 'text': row['爻辞'], 'meaning': row['意味'], 'hiddenId': target, 'hiddenPosition': hidden_position, 'senko': body, 'source': source, 'xiaoxiang': small_images[position - 1]})
     data.append({'id': index, 'name': name, 'judgment': text, 'lines': entries})
 (ROOT / 'public').mkdir(exist_ok=True)
 (ROOT / '.private').mkdir(exist_ok=True)
