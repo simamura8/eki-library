@@ -18,15 +18,13 @@
     <div class="header-right"><span class="collection">六十四卦・三百八十四爻</span><button id="auth" class="quiet">ログアウト</button></div>
   </header>
   <main>
-    <section class="intro"><div><p class="eyebrow">言葉に、すぐ辿りつく。</p><h1>今日、ひらく一爻。</h1><p class="subtle">卦を選び、爻をひらく。原文と意味、そして伏卦まで。</p></div><div class="intro-mark" aria-hidden="true">☰<span>☷</span></div></section>
     <section class="search-section" aria-label="卦と爻を検索">
       <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="卦名・番号・言葉で探す　例：兌為沢3爻、58-3、潜龍" autocomplete="off" aria-label="卦名、番号、本文で検索"><kbd>/</kbd></div>
       <div id="search-results" class="search-results" hidden></div>
-      <div class="search-hint"><span>「沢／澤」「随／隨」などの表記ゆれに対応</span><span>卦を選択 → 初〜上爻を選択</span></div>
+      <div class="search-hint"><span>卦を選択 → 初〜上爻を選択</span></div>
     </section>
     <div class="workspace">
       <aside class="navigator" aria-label="卦一覧">
-        <div class="nav-heading"><h2>卦を選ぶ</h2><span id="nav-count">64 卦</span></div>
         <div class="views" role="group" aria-label="一覧の表示方法"><button data-view="list" aria-pressed="true">六十四卦</button><button data-view="matrix" aria-pressed="false">八卦表</button><button data-view="saved" aria-pressed="false">しおり</button></div>
         <div id="nav-content"></div>
         <div id="recent" class="recent"></div>

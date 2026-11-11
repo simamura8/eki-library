@@ -22,7 +22,6 @@ function renderNav(){
     const trigrams=['天','沢','火','雷','風','水','山','地'];
     $('#nav-content').innerHTML=`<p class="matrix-caption">縦：上卦　／　横：下卦</p><div class="matrix-scroll"><table class="matrix"><thead><tr><th></th>${trigrams.map(t=>`<th scope="col">${t}</th>`).join('')}</tr></thead><tbody>${trigrams.map(u=>`<tr><th scope="row">${u}</th>${trigrams.map(l=>{const g=catalog.find(g=>g.upper===u&&g.lower===l);return `<td><button data-gua="${g.id}" title="${escape(g.name)}" aria-label="${escape(g.name)}" class="${g.id===selected?'active':''}">${g.id}</button></td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`;
   } else $('#nav-content').innerHTML=saved.length?`<div class="gua-list">${saved.map(key=>{const [id,p]=key.split('-').map(Number),g=catalog[id-1];return `<button class="gua-item ${id===selected&&p===position?'active':''}" data-gua="${id}" data-position="${p}"><span class="symbol" aria-hidden="true">${symbol(id)}</span>${escape(g.name)} ${labels[p-1]}</button>`;}).join('')}</div>`:'<p class="empty">気になる爻に「しおり」を付けると、<br>ここからすぐにひらけます。</p>';
-  $('#nav-count').textContent=view==='saved'?`${saved.length} 件`:'64 卦';
   $('#recent').innerHTML=recent.length?`<h3>最近ひらいた爻</h3>${recent.map(key=>{const [id,p]=key.split('-').map(Number);return `<button data-gua="${id}" data-position="${p}">${escape(catalog[id-1].name)} ${labels[p-1]}</button>`;}).join('')}`:'';
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
 }
