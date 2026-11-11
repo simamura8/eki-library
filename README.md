@@ -36,7 +36,7 @@ Cloudflare Workersで公開する、64卦・384爻の個人用リファレンス
 
 https://eki-library-private.imaron0812.workers.dev
 
-GitHubのmainはソース管理用です。本文・鍵・ログイン情報ファイルはpushしません。旧GitHub PagesはCloudflare版の動作確認後に停止します。
+GitHubのmainはソース管理用です。本文・鍵・ログイン情報ファイルはpushしません。旧GitHub Pagesは本文を含まない移転案内だけを配信し、Cloudflare版へ転送します。
 
 ## 再配備
 
