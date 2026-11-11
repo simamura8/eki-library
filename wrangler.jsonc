@@ -6,9 +6,14 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
   "observability": { "enabled": true },
+  "ratelimits": [{ "name": "LOGIN_LIMITER", "namespace_id": "2026111101", "simple": { "limit": 10, "period": 60 } }],
   "vars": {
-    "ALLOWED_EMAIL": "imaron0812@gmail.com",
-    "SITE_ORIGIN": "https://simamura8.github.io"
+    "SITE_ORIGIN": "https://eki-library-private.imaron0812.workers.dev"
   }
 }

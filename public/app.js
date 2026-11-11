@@ -1,8 +1,8 @@
 import { labels, search, validData } from './core.js';
 const $ = s => document.querySelector(s);
 const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let catalog=[], data=null, selected=1, position=1, view='list', popup=null, nonce='', toastTimer;
-const readStore = key => {try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v.filter(x=>typeof x==='string'&&/^\d{1,2}-[1-6]$/.test(x)):[];}catch{return[];}};
+let catalog=[], data=null, selected=1, position=1, view='list', toastTimer;
+const readStore = key => {try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v.filter(x=>typeof x==='string'&&/^\d{1,2}-[1-6]$/.test(x)&&+x.split('-')[0]>=1&&+x.split('-')[0]<=64):[];}catch{return[];}};
 let saved=readStore('eki-saved'), recent=readStore('eki-recent');
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{toast('このブラウザでは履歴を保存できません。');}}
 function toast(message){clearTimeout(toastTimer);$('#status').textContent=message;$('#status').hidden=false;toastTimer=setTimeout(()=>$('#status').hidden=true,3500);}
@@ -33,32 +33,12 @@ function renderReader(){
   ${full?`<div class="judgment"><p class="label">卦辞</p><p class="quote">${escape(full.judgment)}</p></div>`:''}
   <div class="line-tabs" role="tablist" aria-label="爻を選ぶ">${labels.map((label,i)=>`<button id="tab-${i+1}" role="tab" aria-selected="${position===i+1}" aria-controls="line-panel" tabindex="${position===i+1?0:-1}" data-line="${i+1}">${label}</button>`).join('')}</div>
   <div id="line-panel" role="tabpanel" aria-labelledby="tab-${position}"><div class="line-header"><h3>${labels[position-1]}</h3><small>${position} / 6</small></div>
-  ${line?`<p class="line-text">${escape(line.text)}</p><div class="meaning"><p class="label">意味</p><p>${escape(line.meaning)}</p></div><div class="hidden-gua"><p class="label">伏卦</p><div class="hidden-heading"><h3>${escape(hidden.name)} ${hiddenLine.label}</h3><button data-gua="${hidden.id}" data-position="${hiddenLine.position}">この爻をひらく →</button></div><p class="quote">${escape(hiddenLine.text)}</p><p class="hidden-meaning">${escape(hiddenLine.meaning)}</p></div>`:`<div class="lock-panel"><div class="lock-icon" aria-hidden="true">⌑</div><h3>あなただけの、易の書庫。</h3><p>卦辞・爻辞の本文は、<br>メール認証後にひらきます。</p><button class="primary" data-login>ログインして本文をひらく</button><div class="diagram" aria-label="卦の形（下から初爻）">${[...g.bits].reverse().map((bit,i)=>`<button data-line="${6-i}" class="${position===6-i?'selected':''}" aria-label="${labels[5-i]}">${bit==='1'?'<i></i>':'<i></i><i></i>'}</button>`).join('')}</div></div>`}</div>
+  ${line?`<p class="line-text">${escape(line.text)}</p><div class="meaning"><p class="label">意味</p><p>${escape(line.meaning)}</p></div><div class="hidden-gua"><p class="label">伏卦</p><div class="hidden-heading"><h3>${escape(hidden.name)} ${hiddenLine.label}</h3><button data-gua="${hidden.id}" data-position="${hiddenLine.position}">この爻をひらく →</button></div><p class="quote">${escape(hiddenLine.text)}</p><p class="hidden-meaning">${escape(hiddenLine.meaning)}</p></div>`:`<div class="lock-panel"><div class="lock-icon" aria-hidden="true">⌑</div><h3>あなただけの、易の書庫。</h3><p>卦辞・爻辞の本文は、<br>ログイン後にひらきます。</p><button class="primary" data-login>ログインして本文をひらく</button><div class="diagram" aria-label="卦の形（下から初爻）">${[...g.bits].reverse().map((bit,i)=>`<button data-line="${6-i}" class="${position===6-i?'selected':''}" aria-label="${labels[5-i]}">${bit==='1'?'<i></i>':'<i></i><i></i>'}</button>`).join('')}</div></div>`}</div>
   <div class="reader-bottom"><button data-prev>← 前の爻</button><button id="copy-link">リンクをコピー</button><button data-next>次の爻 →</button></div>`;
   document.title=`${g.name} ${labels[position-1]} — 易の書庫`;
 }
 function render(){renderNav();renderReader();}
-function login(){
-  $('#login-dialog').showModal();
-  const configured=Boolean(window.EKI_CONFIG?.apiUrl);
-  $('#login-message').textContent=configured?'':'ただいま閲覧認証を設定中です。本文はまだ公開されていません。';
-  $('#start-login').disabled=!configured;
-}
-function beginLogin(){
-  const api=new URL(window.EKI_CONFIG.apiUrl);
-  if(api.protocol!=='https:'){toast('認証先の設定を確認してください。');return;}
-  nonce=crypto.randomUUID();
-  const url=new URL('/connect',api);url.searchParams.set('nonce',nonce);
-  popup=window.open(url,'eki-auth','width=520,height=740');
-  $('#login-message').textContent=popup?'別ウィンドウでメール認証を完了してください。':'ポップアップがブロックされました。このサイトのポップアップを許可して再度お試しください。';
-}
-window.addEventListener('message',event=>{
-  const api=window.EKI_CONFIG?.apiUrl;if(!api)return;
-  if(event.origin!==new URL(api).origin || event.source!==popup || event.data?.type!=='eki-data' || event.data?.nonce!==nonce)return;
-  if(!validData(event.data.data)){toast('本文データを確認できませんでした。');return;}
-  data=event.data.data;nonce='';popup?.close();popup=null;$('#login-dialog').close();$('#auth').textContent='ログアウト';render();toast('書庫をひらきました。');
-  if($('#search').value)runSearch();
-});
+function login(){ location.assign('/login'+location.hash); }
 function runSearch(){
   const value=$('#search').value;if(!value.trim()){$('#search-results').hidden=true;return;}
   const results=search(catalog,data,value);
@@ -78,8 +58,13 @@ document.addEventListener('click',async event=>{
   else if(b.hasAttribute('data-next')){if(position<6)go(selected,position+1);else go(selected===64?1:selected+1,1);}
   else if(b.id==='copy-link'){try{await navigator.clipboard.writeText(location.href);toast('この爻へのリンクをコピーしました。');}catch{toast('アドレスバーのURLをコピーしてください。');}}
 });
-$('#auth').addEventListener('click',()=>{if(data){data=null;$('#auth').textContent='ログイン';$('#search').value='';$('#search-results').hidden=true;render();const api=window.EKI_CONFIG?.apiUrl;if(api)window.open(new URL('/cdn-cgi/access/logout',api),'eki-auth','width=520,height=740');toast('ログアウトしました。');}else login();});
-$('#start-login').addEventListener('click',beginLogin);$('#close-dialog').addEventListener('click',()=>$('#login-dialog').close());
+$('#auth').addEventListener('click',async()=>{
+  try{
+    const response=await fetch('/auth/logout',{method:'POST',credentials:'same-origin',headers:{'X-Eki-CSRF':'logout'}});
+    if(!response.ok)throw Error('logout');
+    data=null;$('#reader').replaceChildren();location.replace('/login');
+  }catch{toast('ログアウトできませんでした。通信を確認して再度お試しください。');}
+});
 $('#search').addEventListener('input',runSearch);
 $('#search').addEventListener('keydown',event=>{if(event.key==='Enter'){const first=$('#search-results button');if(first)first.click();}else if(event.key==='Escape')$('#search-results').hidden=true;else if(event.key==='ArrowDown'){event.preventDefault();$('#search-results button')?.focus();}});
 document.addEventListener('keydown',event=>{
@@ -90,4 +75,9 @@ document.addEventListener('keydown',event=>{
 });
 function readHash(){const m=location.hash.match(/^#(\d{1,2})-([1-6])$/);if(m&&+m[1]>=1&&+m[1]<=64){selected=+m[1];position=+m[2];}render();}
 window.addEventListener('hashchange',readHash);
-try{const response=await fetch('./catalog.json');if(!response.ok)throw Error('catalog');catalog=await response.json();readHash();}catch{$('#reader').innerHTML='<p>卦の一覧を読み込めませんでした。ページを再読み込みしてください。</p>';}
+try{
+  const get=async url=>{const response=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(response.status===401){login();throw Error('login');}if(!response.ok)throw Error('load');return response.json();};
+  const [loadedCatalog,loadedData]=await Promise.all([get('./catalog.json'),get('/api/data')]);
+  if(!validData(loadedData))throw Error('data');
+  catalog=loadedCatalog;data=loadedData;readHash();
+}catch{$('#reader').innerHTML='<p>書庫を読み込めませんでした。ページを再読み込みしてください。</p>';}

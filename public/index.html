@@ -9,14 +9,13 @@
   <title>易の書庫 — 卦辞・爻辞</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
-  <script src="config.js" defer></script>
   <script src="app.js" type="module"></script>
 </head>
 <body>
   <a href="#reader" class="skip">本文へ</a>
   <header class="masthead">
     <a class="brand" href="#"><span class="seal">易</span><span>易の書庫<small>PRIVATE I CHING LIBRARY</small></span></a>
-    <div class="header-right"><span class="collection">六十四卦・三百八十四爻</span><button id="auth" class="quiet">ログイン</button></div>
+    <div class="header-right"><span class="collection">六十四卦・三百八十四爻</span><button id="auth" class="quiet">ログアウト</button></div>
   </header>
   <main>
     <section class="intro"><div><p class="eyebrow">言葉に、すぐ辿りつく。</p><h1>今日、ひらく一爻。</h1><p class="subtle">卦を選び、爻をひらく。原文と意味、そして伏卦まで。</p></div><div class="intro-mark" aria-hidden="true">☰<span>☷</span></div></section>
@@ -37,6 +36,5 @@
     <footer><span>易経大講座より · 個人用閲覧室</span><span>占例を除く、卦辞・爻辞・意味・伏卦を収録</span></footer>
   </main>
   <div id="status" class="toast" role="status" hidden></div>
-  <dialog id="login-dialog"><button class="close" id="close-dialog" aria-label="閉じる">×</button><span class="seal">易</span><p class="eyebrow">あなたのための書庫</p><h2>本文をひらく</h2><p>登録したメールアドレスに届く<br>確認コードでログインします。</p><p class="subtle">認証後、この画面に戻ると本文が表示されます。</p><button id="start-login" class="primary">メール認証へ進む ↗</button><p id="login-message" class="subtle" role="status"></p></dialog>
 </body>
 </html>
