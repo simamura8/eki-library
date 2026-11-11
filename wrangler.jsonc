@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eki-library-private",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "vars": {
+    "ALLOWED_EMAIL": "imaron0812@gmail.com",
+    "SITE_ORIGIN": "https://simamura8.github.io"
+  }
+}

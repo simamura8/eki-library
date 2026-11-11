@@ -1,0 +1,13 @@
+{
+  "name": "eki-library",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "preview": "node scripts/preview.mjs",
+    "publish:pages": "node scripts/publish.mjs",
+    "deploy:api": "wrangler deploy"
+  },
+  "devDependencies": { "wrangler": "^4.128.0", "@cloudflare/workers-types": "latest" }
+}
